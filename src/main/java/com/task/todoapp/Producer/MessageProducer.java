@@ -1,6 +1,7 @@
 package com.task.todoapp.Producer;
 
 import com.task.todoapp.dao.Task;
+import com.task.todoapp.dto.TaskDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -26,14 +27,14 @@ public class MessageProducer {
     private static final Logger LOGGER= LoggerFactory.getLogger(MessageProducer.class);
 
 
-    public void sendMessage(Task task) {
+    public void sendMessage(TaskDto task) {
         rabbitTemplate.convertAndSend(exchangeName, routingKey, task);
     }
 
-    public void sendMessage(List<Task> tasks) {
+    public void sendMessage(List<TaskDto> tasks) {
         LOGGER.info("Sending " + tasks.size() + " tasks to Queue");
-        for(Task t:tasks){
-            rabbitTemplate.convertAndSend(exchangeName, routingKey, t);
+        for(TaskDto task:tasks){
+            rabbitTemplate.convertAndSend(exchangeName, routingKey, task);
         }
     }
 

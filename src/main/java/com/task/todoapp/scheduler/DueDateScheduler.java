@@ -3,10 +3,12 @@ package com.task.todoapp.scheduler;
 import com.task.todoapp.Producer.MessageProducer;
 import com.task.todoapp.dao.Task;
 import com.task.todoapp.dao.TaskStatus;
+import com.task.todoapp.dto.TaskDto;
 import com.task.todoapp.service.TaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -25,15 +27,14 @@ public class DueDateScheduler {
 
     private static final Logger LOGGER= LoggerFactory.getLogger(DueDateScheduler.class);
 
-    @Scheduled(cron = "* * * * * *")
+    @Scheduled(cron = "${scheduler.overdue.cron.expression}")
     public void checkDueDate() {
-        System.out.println("Checking due date...");
+        LOGGER.info("Checking due date");
         LocalDateTime now = LocalDateTime.now();
-        List<Task> overDueTasks=taskService.getOverdueTasks(now);
+        List<TaskDto> overDueTasks=taskService.getOverdueTasks(now);
         if(!overDueTasks.isEmpty()) {
-            LOGGER.info(String.format("Sending Overdue Task to Producer. Status Updated"));
-            messageProducer.sendMessage(overDueTasks.stream().map(task -> {task.setStatus(TaskStatus.CANCELLED);
-                                                return task;}).collect(Collectors.toList()));
+            LOGGER.info("Sending Overdue Task to Producer");
+            messageProducer.sendMessage(overDueTasks);
         }
     }
 }

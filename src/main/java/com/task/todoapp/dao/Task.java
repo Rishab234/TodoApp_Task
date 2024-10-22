@@ -1,5 +1,6 @@
 package com.task.todoapp.dao;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -11,8 +12,6 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @Table(indexes = {@Index(name = "idx_username", columnList = "userName")})
@@ -54,4 +53,5 @@ public class Task {
                 ", dueDate=" + dueDate +
                 '}';
     }
+
 }

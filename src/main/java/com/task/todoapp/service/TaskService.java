@@ -2,7 +2,9 @@ package com.task.todoapp.service;
 
 import com.task.todoapp.dao.Task;
 import com.task.todoapp.dao.TaskStatus;
+import com.task.todoapp.dto.TaskDto;
 import com.task.todoapp.repo.TaskRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,32 +18,36 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository ;
 
-    public List<Task> getAll() {
-        return taskRepository.findAll();
+    @Autowired
+    ModelMapper modelMapper;
+
+    public List<TaskDto> getAll() {
+        return convertListTaskToDto(taskRepository.findAll());
     }
 
-    public Optional<Task> getById(Integer id) {
-        return taskRepository.findById(id);
+    public Optional<TaskDto> getById(Integer id) {
+        return (convertTaskToDto(taskRepository.findById(id)));
     }
 
-    public List<Task> getByStatus(TaskStatus status){
-        return taskRepository.findByStatus(status);
+
+    public List<TaskDto> getByStatus(TaskStatus status){
+        return convertListTaskToDto(taskRepository.findByStatus(status));
     }
-    public List<Task> getByName(String userName) {
-        return  taskRepository.findByUserName(userName);
+    public List<TaskDto> getByName(String userName) {
+        return  convertListTaskToDto(taskRepository.findByUserName(userName));
     }
-    public List<Task> getByTitle(String title){
-        return taskRepository.findByTitle(title);
+    public List<TaskDto> getByTitle(String title){
+        return convertListTaskToDto(taskRepository.findByTitle(title));
     }
 
     //crud
-    public void addTask(Task task) {
+    public void addTask(TaskDto taskDto) {
 
-        taskRepository.save(task);
+        taskRepository.save(converDtoToTask(taskDto));
     }
 
-    public Optional<Task> deleteTaskById(Integer id) {
-        Optional<Task> task = getById(id);
+    public Optional<TaskDto> deleteTaskById(Integer id) {
+        Optional<TaskDto> task = getById(id);
 
         if(task.isPresent()) {
             taskRepository.deleteById(id);
@@ -51,20 +57,18 @@ public class TaskService {
             return Optional.empty();
     }
 
-    public Boolean updateTaskById(Task task,Integer id){
-
-        Optional<Task> taskOptional = getById(id);
+    public Boolean updateTaskById(TaskDto task,Integer id){
+        Optional<Task> taskOptional = taskRepository.findById(id);
         if(taskOptional.isPresent()) {
-            Task newTask = taskOptional.get();
+            Task existingTask = taskOptional.get();
 
             if(task.getTitle()!=null)
-                newTask.setTitle(task.getTitle());
+                existingTask.setTitle(task.getTitle());
             if(task.getUserName()!=null)
-                newTask.setUserName(task.getUserName());
+                existingTask.setUserName(task.getUserName());
             if(task.getStatus() != null)
-                newTask.setStatus(task.getStatus());
-
-            taskRepository.save(newTask);
+                existingTask.setStatus(task.getStatus());
+            taskRepository.save(existingTask);
             return true;
         }
         else{
@@ -72,9 +76,27 @@ public class TaskService {
         }
     }
 
-    public List<Task> getOverdueTasks(LocalDateTime now) {
-        return taskRepository.findByDueDateBefore(now);
+    public List<TaskDto> getOverdueTasks(LocalDateTime now) {
+        return convertListTaskToDto(taskRepository.findByDueDateBefore(now));
     }
+
+    public Task converDtoToTask(TaskDto taskDto) {
+        return modelMapper.map(taskDto, Task.class);
+    }
+    public TaskDto converTasktoDto(Task task) {
+        return modelMapper.map(task, TaskDto.class);
+    }
+
+    public Optional<TaskDto> convertTaskToDto(Optional<Task> tasks) {
+        return tasks.map(task -> modelMapper.map(task, TaskDto.class));
+    }
+
+
+    public List<TaskDto> convertListTaskToDto(List<Task> tasks) {
+        return tasks.stream().map(task -> modelMapper.map(task,TaskDto.class)).toList();
+    }
+
+
 
 
 
