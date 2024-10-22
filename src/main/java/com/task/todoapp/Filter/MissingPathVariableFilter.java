@@ -24,14 +24,14 @@ public class MissingPathVariableFilter implements Filter {
 
         String uri = httpServletRequest.getRequestURI();
 
-//        if(uri.matches(".*/delete/$")) {
-//            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,"Path variable cant be null: id required");
-//            return;
-//        }
-//        if(uri.matches(".*/update/$")) {
-//            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,"Path variable cant be null: id required");
-//            return;
-//        }
+        if(uri.matches(".*/delete/$")) {
+            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,"Path variable cant be null: id required");
+            return;
+        }
+        if(uri.matches(".*/update/$")) {
+            httpServletResponse.sendError(HttpServletResponse.SC_BAD_REQUEST,"Path variable cant be null: id required");
+            return;
+        }
 
         chain.doFilter(request, response);
     }

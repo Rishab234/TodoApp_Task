@@ -83,14 +83,10 @@ public class TaskService {
     public Task converDtoToTask(TaskDto taskDto) {
         return modelMapper.map(taskDto, Task.class);
     }
-    public TaskDto converTasktoDto(Task task) {
-        return modelMapper.map(task, TaskDto.class);
-    }
 
     public Optional<TaskDto> convertTaskToDto(Optional<Task> tasks) {
         return tasks.map(task -> modelMapper.map(task, TaskDto.class));
     }
-
 
     public List<TaskDto> convertListTaskToDto(List<Task> tasks) {
         return tasks.stream().map(task -> modelMapper.map(task,TaskDto.class)).toList();
